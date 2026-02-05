@@ -184,10 +184,10 @@ function Add-MenuButton($text, $y, $onClick) {
 }
 
 Add-MenuButton "Analyse système" 10 { Show-AnalyseSysteme }
-Add-MenuButton "Sauvegarde"      55 { Write-Log "Section Sauvegarde (à implémenter)" "Blue" }
-Add-MenuButton "ISO Linux"       100 { Write-Log "Section ISO Linux (à implémenter)" "Blue" }
-Add-MenuButton "Clé USB"         145 { Write-Log "Section Clé USB (à implémenter)" "Blue" }
-Add-MenuButton "Rapport"         190 { Write-Log "Section Rapport (à implémenter)" "Blue" }
+Add-MenuButton "Sauvegarde"      55 { Run-Task "Sauvegarde" { .\Backup.ps1 } }
+Add-MenuButton "ISO Linux"       100 { Run-Task "Téléchargement ISO" { .\Download-ISO.ps1 } }
+Add-MenuButton "Clé USB"         145 { Run-Task "Création clé USB" { .\Create-USB.ps1 } }
+Add-MenuButton "Rapport"         190  { Run-Task "Rapport" { .\Report.ps1 } }
 Add-MenuButton "Mode avancé"     235 { Show-ModeAvance }
 
 #========================
