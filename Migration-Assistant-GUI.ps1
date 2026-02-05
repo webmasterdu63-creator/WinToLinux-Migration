@@ -7,6 +7,15 @@ $form.Text = "Assistant de Migration Windows → Linux"
 $form.Size = New-Object System.Drawing.Size(650, 500)
 $form.StartPosition = "CenterScreen"
 
+# Logo en haut de la fenêtre
+$logo = New-Object System.Windows.Forms.PictureBox
+$logo.ImageLocation = "Windows\Assets\WintoLinux.png"   
+$logo.SizeMode = "Zoom"
+$logo.Size = New-Object System.Drawing.Size(180, 180)
+$logo.Location = New-Object System.Drawing.Point(235, 5)  
+$form.Controls.Add($logo)
+
+
 # Titre
 $labelTitle = New-Object System.Windows.Forms.Label
 $labelTitle.Text = "Assistant de Migration Windows → Linux"
