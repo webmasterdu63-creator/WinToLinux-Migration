@@ -11,7 +11,6 @@ Assistant complet de migration Windows → Linux
 (sauvegarde, ISO, clé USB bootable, restauration, post-installation)
 Assistant de migration Windows → Linux (sauvegarde, ISO, clé USB, restauration)
 # WinToLinux-Migration  
-Assistant complet de migration Windows → Linux  
 (sauvegarde, ISO, clé USB bootable, restauration, post-installation)
 ## 🎯 Objectif du projet
 - Analyse du système Windows  
