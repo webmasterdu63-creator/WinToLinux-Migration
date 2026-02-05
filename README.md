@@ -30,7 +30,7 @@ Ce projet vise à simplifier la transition pour les utilisateurs, tout en offran
 # Automated Setup: Windows & Linux Environment
 
 <p align="center">
-  <img src="assets/votre-logo-automatisation.png" width="200" alt="Automation Logo">
+  <img src="logo2.png" width="200" alt="WinToLinux Logo">
 </p>
 
 <p align="center">
