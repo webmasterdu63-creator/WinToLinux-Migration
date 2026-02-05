@@ -1,67 +1,73 @@
 #!/bin/bash
 
-echo "==============================================="
-echo "   Installation des logiciels essentiels Linux"
-echo "==============================================="
-echo ""
+# ============================================
+#  WinToLinux Migration - Install Packages
+#  Author : Jean
+#  Description : Install required packages for supported Linux distributions
+#  Supports : Ubuntu, Linux Mint, Zorin OS, Debian
+# ============================================
 
-# Vérification sudo
+# --- Colors ---
+GREEN="\e[32m"
+RED="\e[31m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+RESET="\e[0m"
+
+echo -e "${BLUE}---------------------------------------------${RESET}"
+echo -e "${BLUE}   WinToLinux Migration - Package Installer   ${RESET}"
+echo -e "${BLUE}---------------------------------------------${RESET}"
+
+# --- Check root privileges ---
 if [ "$EUID" -ne 0 ]; then
-    echo "Veuillez exécuter ce script avec sudo."
+    echo -e "${RED}[ERROR] Please run this script as root (sudo).${RESET}"
     exit 1
 fi
 
-# Mise à jour des dépôts
-echo ""
-echo "Mise à jour du système..."
-apt update -y
-apt upgrade -y
-
-echo ""
-echo "Installation des logiciels équivalents Windows → Linux"
-echo ""
-
-# Liste des logiciels à installer
-PACKAGES=(
-    "chromium-browser"   # Alternative à Chrome
-    "vlc"                # Alternative VLC
-    "p7zip-full"         # Alternative 7zip
-    "code"               # VSCode (si repo activé)
-    "steam-installer"    # Steam
-    "discord"            # Discord
-    "obs-studio"         # OBS
-)
-
-# Ajout des dépôts nécessaires
-echo ""
-echo "Activation des dépôts nécessaires..."
-apt install -y software-properties-common apt-transport-https wget gpg
-
-# VSCode
-if ! command -v code &> /dev/null; then
-    echo "Ajout du dépôt VSCode..."
-    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/packages.microsoft.gpg
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list
+# --- Detect distribution ---
+if [ -f /etc/os-release ]; then
+    source /etc/os-release
+    DISTRO=$ID
+else
+    echo -e "${RED}[ERROR] Unable to detect your Linux distribution.${RESET}"
+    exit 1
 fi
 
-# Discord
-if ! command -v discord &> /dev/null; then
-    echo "Téléchargement de Discord..."
-    wget -O /tmp/discord.deb "https://discord.com/api/download?platform=linux&format=deb"
-    apt install -y /tmp/discord.deb
-fi
+echo -e "${GREEN}[INFO] Detected distribution: $DISTRO${RESET}"
 
-# Mise à jour après ajout des dépôts
-apt update -y
+# --- Installation function ---
+install_packages() {
+    echo -e "${GREEN}[INFO] Updating package lists...${RESET}"
 
-# Installation des paquets
-for pkg in "${PACKAGES[@]}"; do
-    echo ""
-    echo "Installation de : $pkg"
-    apt install -y "$pkg"
-done
+    case "$DISTRO" in
 
-echo ""
-echo "Installation terminée."
-echo "Vos logiciels essentiels sont maintenant installés."
-echo ""
+        ubuntu|linuxmint|zorin)
+            apt update -y
+            apt install -y curl git wget software-properties-common lsb-release
+            ;;
+
+        debian)
+            apt update -y
+            apt install -y curl git wget lsb-release
+            ;;
+
+        *)
+            echo -e "${RED}[ERROR] Unsupported distribution: $DISTRO${RESET}"
+            echo -e "${YELLOW}[INFO] Supported distros: Ubuntu, Mint, Zorin, Debian${RESET}"
+            exit 1
+            ;;
+    esac
+
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}[SUCCESS] Packages installed successfully.${RESET}"
+    else
+        echo -e "${RED}[ERROR] Package installation failed.${RESET}"
+        exit 1
+    fi
+}
+
+# --- Run installation ---
+install_packages
+
+echo -e "${GREEN}[DONE] Installation process completed.${RESET}"
+exit 0
