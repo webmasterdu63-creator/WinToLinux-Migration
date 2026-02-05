@@ -1,34 +1,40 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
-# Fenêtre
+#========================
+# Fenêtre principale
+#========================
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Assistant de Migration Windows → Linux"
-$form.Size = New-Object System.Drawing.Size(650, 500)
+$form.Size = New-Object System.Drawing.Size(900, 550)
 $form.StartPosition = "CenterScreen"
 
-# Logo en haut de la fenêtre
+# Logo en haut
 $logo = New-Object System.Windows.Forms.PictureBox
-$logo.ImageLocation = "Windows\Assets\WintoLinux.png"   
+$logo.ImageLocation = "Windows\Assets\WintoLinux.png"
 $logo.SizeMode = "Zoom"
 $logo.Size = New-Object System.Drawing.Size(180, 180)
-$logo.Location = New-Object System.Drawing.Point(235, 5)  
+$logo.Location = New-Object System.Drawing.Point(360, 5)
 $form.Controls.Add($logo)
 
+#========================
+# Barre de progression
+#========================
+$progressBar = New-Object System.Windows.Forms.ProgressBar
+$progressBar.Location = New-Object System.Drawing.Point(10, 500)
+$progressBar.Size = New-Object System.Drawing.Size(870, 20)
+$progressBar.Minimum = 0
+$progressBar.Maximum = 100
+$progressBar.Value = 0
+$form.Controls.Add($progressBar)
 
-# Titre
-$labelTitle = New-Object System.Windows.Forms.Label
-$labelTitle.Text = "Assistant de Migration Windows → Linux"
-$labelTitle.AutoSize = $true
-$labelTitle.Font = New-Object System.Drawing.Font("Segoe UI", 14, [System.Drawing.FontStyle]::Bold)
-$labelTitle.Location = New-Object System.Drawing.Point(120, 20)
-$form.Controls.Add($labelTitle)
-
+#========================
 # Zone de log
+#========================
 $logBox = New-Object System.Windows.Forms.RichTextBox
 $logBox.ReadOnly = $true
-$logBox.Size = New-Object System.Drawing.Size(600, 180)
-$logBox.Location = New-Object System.Drawing.Point(20, 260)
+$logBox.Size = New-Object System.Drawing.Size(550, 200)
+$logBox.Location = New-Object System.Drawing.Point(320, 280)
 $form.Controls.Add($logBox)
 
 function Write-Log($msg, $color="Black") {
@@ -36,89 +42,165 @@ function Write-Log($msg, $color="Black") {
     $logBox.AppendText("[$(Get-Date -Format 'HH:mm:ss')] $msg`r`n")
 }
 
-# --- Sélecteur de distribution Linux ---
-$labelDistro = New-Object System.Windows.Forms.Label
-$labelDistro.Text = "Distribution Linux :"
-$labelDistro.Location = New-Object System.Drawing.Point(20, 70)
-$form.Controls.Add($labelDistro)
+#========================
+# Panneau latéral (menu)
+#========================
+$panelMenu = New-Object System.Windows.Forms.Panel
+$panelMenu.Size = New-Object System.Drawing.Size(280, 460)
+$panelMenu.Location = New-Object System.Drawing.Point(10, 20)
+$panelMenu.BorderStyle = "FixedSingle"
+$form.Controls.Add($panelMenu)
 
-$comboDistro = New-Object System.Windows.Forms.ComboBox
-$comboDistro.Location = New-Object System.Drawing.Point(150, 65)
-$comboDistro.Width = 200
-$comboDistro.Items.AddRange(@("Ubuntu", "Linux Mint", "Debian"))
-$comboDistro.SelectedIndex = 0
-$form.Controls.Add($comboDistro)
+#========================
+# Panneau de contenu
+#========================
+$panelContent = New-Object System.Windows.Forms.Panel
+$panelContent.Size = New-Object System.Drawing.Size(580, 250)
+$panelContent.Location = New-Object System.Drawing.Point(300, 200)
+$panelContent.BorderStyle = "FixedSingle"
+$form.Controls.Add($panelContent)
 
-# --- Détection automatique des clés USB ---
-function Get-USBDrives {
-    Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq 2 }
+#========================
+# Fonctions utilitaires
+#========================
+function Reset-Progress {
+    $progressBar.Value = 0
 }
 
-$labelUSB = New-Object System.Windows.Forms.Label
-$labelUSB.Text = "Clé USB détectée :"
-$labelUSB.Location = New-Object System.Drawing.Point(20, 110)
-$form.Controls.Add($labelUSB)
-
-$comboUSB = New-Object System.Windows.Forms.ComboBox
-$comboUSB.Location = New-Object System.Drawing.Point(150, 105)
-$comboUSB.Width = 200
-$form.Controls.Add($comboUSB)
-
-# Charger les clés USB au démarrage
-$usbList = Get-USBDrives
-foreach ($usb in $usbList) {
-    $comboUSB.Items.Add("$($usb.DeviceID) — $($usb.VolumeName)")
+function Run-Task($name, $scriptBlock) {
+    Write-Log "Début : $name" "Blue"
+    Reset-Progress
+    try {
+        & $scriptBlock
+        $progressBar.Value = 100
+        Write-Log "Terminé : $name" "Green"
+    } catch {
+        Write-Log "Erreur : $($_.Exception.Message)" "Red"
+    }
 }
-if ($comboUSB.Items.Count -gt 0) { $comboUSB.SelectedIndex = 0 }
 
-# --- Boutons d’actions ---
-$buttons = @(
-    @{ Text = "Analyse système";      X = 400; Y = 60;  Script = ".\Backup.ps1 -AnalyseOnly" },
-    @{ Text = "Sauvegarde données";   X = 400; Y = 100; Script = ".\Backup.ps1" },
-    @{ Text = "Télécharger ISO";      X = 20;  Y = 150; Script = ".\Download-ISO.ps1" },
-    @{ Text = "Créer clé USB";        X = 400; Y = 150; Script = ".\Create-USB.ps1" },
-    @{ Text = "Générer rapport";      X = 20;  Y = 190; Script = ".\Report.ps1" }
-)
+#========================
+# Contenu : Analyse système
+#========================
+function Show-AnalyseSysteme {
+    $panelContent.Controls.Clear()
 
-foreach ($b in $buttons) {
-    $btn = New-Object System.Windows.Forms.Button
-    $btn.Text = $b.Text
-    $btn.Size = New-Object System.Drawing.Size(200, 30)
-    $btn.Location = New-Object System.Drawing.Point($b.X, $b.Y)
-    $btn.Add_Click({
-        Write-Log "Exécution : $($this.Text)" "Blue"
-        try {
-            Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$($b.Script)`"" -Wait
-            Write-Log "Terminé : $($this.Text)" "Green"
-        } catch {
-            Write-Log "Erreur lors de l'exécution." "Red"
+    $label = New-Object System.Windows.Forms.Label
+    $label.Text = "Analyse automatique du système Windows"
+    $label.AutoSize = $true
+    $label.Location = New-Object System.Drawing.Point(10, 10)
+    $panelContent.Controls.Add($label)
+
+    $btnTest = New-Object System.Windows.Forms.Button
+    $btnTest.Text = "Lancer le test de compatibilité"
+    $btnTest.Size = New-Object System.Drawing.Size(250, 30)
+    $btnTest.Location = New-Object System.Drawing.Point(10, 50)
+    $btnTest.Add_Click({
+        Run-Task "Test système" {
+            $progressBar.Value = 10
+            $os = Get-CimInstance Win32_OperatingSystem
+            $cpu = Get-CimInstance Win32_Processor
+            $ram = [math]::Round($os.TotalVisibleMemorySize / 1MB, 1)
+            $disk = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'"
+
+            $progressBar.Value = 40
+            Write-Log "Windows : $($os.Caption) ($($os.OSArchitecture))"
+            Write-Log "Version : $($os.Version)"
+            Write-Log "CPU : $($cpu.Name)"
+            Write-Log "RAM : $ram Go"
+            Write-Log "Disque C: Espace libre : {0:N2} Go" -f ($disk.FreeSpace/1GB)
+
+            $progressBar.Value = 70
+            # Exemple de règles simples de compatibilité
+            $compatible = $true
+            if ($ram -lt 4) {
+                Write-Log "Attention : moins de 4 Go de RAM." "Red"
+                $compatible = $false
+            }
+            if (($disk.FreeSpace/1GB) -lt 20) {
+                Write-Log "Attention : moins de 20 Go libres sur C:." "Red"
+                $compatible = $false
+            }
+
+            $progressBar.Value = 90
+            if ($compatible) {
+                Write-Log "Compatibilité Linux : BONNE" "Green"
+            } else {
+                Write-Log "Compatibilité Linux : À VÉRIFIER" "Red"
+            }
         }
     })
-    $form.Controls.Add($btn)
+    $panelContent.Controls.Add($btnTest)
 }
 
-# --- Boutons ouvrir dossier ---
-$btnOpenBackup = New-Object System.Windows.Forms.Button
-$btnOpenBackup.Text = "Ouvrir sauvegarde"
-$btnOpenBackup.Size = New-Object System.Drawing.Size(150, 30)
-$btnOpenBackup.Location = New-Object System.Drawing.Point(20, 450)
-$btnOpenBackup.Add_Click({ Start-Process "C:\WinToLinux-Backup" })
-$form.Controls.Add($btnOpenBackup)
+#========================
+# Contenu : Mode avancé
+#========================
+function Show-ModeAvance {
+    $panelContent.Controls.Clear()
 
-$btnOpenISO = New-Object System.Windows.Forms.Button
-$btnOpenISO.Text = "Ouvrir ISO"
-$btnOpenISO.Size = New-Object System.Drawing.Size(150, 30)
-$btnOpenISO.Location = New-Object System.Drawing.Point(200, 450)
-$btnOpenISO.Add_Click({ Start-Process "C:\WinToLinux-ISO" })
-$form.Controls.Add($btnOpenISO)
+    $label = New-Object System.Windows.Forms.Label
+    $label.Text = "Mode avancé - options techniques"
+    $label.AutoSize = $true
+    $label.Location = New-Object System.Drawing.Point(10, 10)
+    $panelContent.Controls.Add($label)
 
-# --- Quitter ---
+    # Exemple : case à cocher logs détaillés
+    $chkVerbose = New-Object System.Windows.Forms.CheckBox
+    $chkVerbose.Text = "Activer les logs détaillés"
+    $chkVerbose.Location = New-Object System.Drawing.Point(10, 40)
+    $panelContent.Controls.Add($chkVerbose)
+
+    $btnSysInfo = New-Object System.Windows.Forms.Button
+    $btnSysInfo.Text = "Afficher les infos système complètes"
+    $btnSysInfo.Size = New-Object System.Drawing.Size(260, 30)
+    $btnSysInfo.Location = New-Object System.Drawing.Point(10, 80)
+    $btnSysInfo.Add_Click({
+        Run-Task "Infos système avancées" {
+            $progressBar.Value = 20
+            $bios = Get-CimInstance Win32_BIOS
+            $cs = Get-CimInstance Win32_ComputerSystem
+            $progressBar.Value = 50
+            Write-Log "Fabricant : $($cs.Manufacturer)"
+            Write-Log "Modèle : $($cs.Model)"
+            Write-Log "BIOS : $($bios.SMBIOSBIOSVersion)"
+            Write-Log "Numéro de série : $($bios.SerialNumber)"
+            $progressBar.Value = 100
+        }
+    })
+    $panelContent.Controls.Add($btnSysInfo)
+}
+
+#========================
+# Menu latéral : boutons
+#========================
+function Add-MenuButton($text, $y, $onClick) {
+    $btn = New-Object System.Windows.Forms.Button
+    $btn.Text = $text
+    $btn.Size = New-Object System.Drawing.Size(260, 35)
+    $btn.Location = New-Object System.Drawing.Point(10, $y)
+    $btn.Add_Click($onClick)
+    $panelMenu.Controls.Add($btn)
+}
+
+Add-MenuButton "Analyse système" 10 { Show-AnalyseSysteme }
+Add-MenuButton "Sauvegarde"      55 { Write-Log "Section Sauvegarde (à implémenter)" "Blue" }
+Add-MenuButton "ISO Linux"       100 { Write-Log "Section ISO Linux (à implémenter)" "Blue" }
+Add-MenuButton "Clé USB"         145 { Write-Log "Section Clé USB (à implémenter)" "Blue" }
+Add-MenuButton "Rapport"         190 { Write-Log "Section Rapport (à implémenter)" "Blue" }
+Add-MenuButton "Mode avancé"     235 { Show-ModeAvance }
+
+#========================
+# Bouton Quitter
+#========================
 $btnQuit = New-Object System.Windows.Forms.Button
 $btnQuit.Text = "Quitter"
 $btnQuit.Size = New-Object System.Drawing.Size(100, 30)
-$btnQuit.Location = New-Object System.Drawing.Point(520, 450)
+$btnQuit.Location = New-Object System.Drawing.Point(780, 470)
 $btnQuit.Add_Click({ $form.Close() })
 $form.Controls.Add($btnQuit)
 
+# Afficher la fenêtre
+Show-AnalyseSysteme
 [void]$form.ShowDialog()
 
