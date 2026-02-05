@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/migration-Windows%20%E2%86%92%20Linux-yellow" />
   <img src="https://img.shields.io/badge/license-MIT-lightgrey" />
 </p>
-
+![Logo](assets/logo2.png)
 Assistant complet de migration Windows → Linux  
 (sauvegarde, ISO, clé USB bootable, restauration, post-installation)
 Assistant de migration Windows → Linux (sauvegarde, ISO, clé USB, restauration)
