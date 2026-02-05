@@ -1,56 +1,85 @@
 #!/bin/bash
 
-echo "==============================================="
-echo "   Script Post-Installation Linux"
-echo "==============================================="
-echo ""
+# ============================================
+#  WinToLinux Migration - Post Install Script
+#  Author : Jean
+#  Description : Apply final configurations after migration
+#  Supports : Ubuntu, Linux Mint, Zorin OS, Debian
+# ============================================
 
-# Vérification sudo
+GREEN="\e[32m"
+RED="\e[31m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+RESET="\e[0m"
+
+echo -e "${BLUE}---------------------------------------------${RESET}"
+echo -e "${BLUE}   WinToLinux Migration - Post Install       ${RESET}"
+echo -e "${BLUE}---------------------------------------------${RESET}"
+
+# --- Check root privileges ---
 if [ "$EUID" -ne 0 ]; then
-    echo "Veuillez exécuter ce script avec sudo."
+    echo -e "${RED}[ERROR] Please run this script as root (sudo).${RESET}"
     exit 1
 fi
 
-echo ""
-echo "Mise à jour du système..."
-apt update -y
-apt upgrade -y
+# --- Detect distribution ---
+if [ -f /etc/os-release ]; then
+    source /etc/os-release
+    DISTRO=$ID
+else
+    echo -e "${RED}[ERROR] Unable to detect your Linux distribution.${RESET}"
+    exit 1
+fi
 
-echo ""
-echo "Activation de Flatpak..."
-apt install -y flatpak
-apt install -y gnome-software-plugin-flatpak 2>/dev/null
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+echo -e "${GREEN}[INFO] Detected distribution: $DISTRO${RESET}"
 
-echo ""
-echo "Installation des codecs multimédia..."
-apt install -y ubuntu-restricted-extras 2>/dev/null
-apt install -y libavcodec-extra
+# --- Function: Install recommended software ---
+install_recommended_apps() {
+    echo -e "${GREEN}[INFO] Installing recommended applications...${RESET}"
 
-echo ""
-echo "Configuration du pare-feu UFW..."
-apt install -y ufw
-ufw allow OpenSSH
-ufw enable
+    case "$DISTRO" in
 
-echo ""
-echo "Nettoyage du système..."
-apt autoremove -y
-apt autoclean -y
+        ubuntu|linuxmint|zorin|debian)
+            apt update -y
+            apt install -y \
+                gnome-tweaks \
+                vlc \
+                gparted \
+                htop \
+                neofetch \
+                curl \
+                git \
+                wget
+            ;;
 
-echo ""
-echo "Optimisations diverses..."
-# Amélioration de la réactivité du système
-sysctl vm.swappiness=10
+        *)
+            echo -e "${YELLOW}[WARNING] No recommended apps list for this distribution.${RESET}"
+            ;;
+    esac
+}
 
-# Activation TRIM pour SSD
-systemctl enable fstrim.timer
+# --- Function: Apply system tweaks ---
+apply_system_tweaks() {
+    echo -e "${GREEN}[INFO] Applying system tweaks...${RESET}"
 
-echo ""
-echo "Installation de quelques outils utiles..."
-apt install -y htop neofetch curl git gparted
+    # Enable firewall
+    if command -v ufw >/dev/null 2>&1; then
+        ufw enable
+    fi
 
-echo ""
-echo "Configuration terminée."
-echo "Votre système Linux est maintenant optimisé et prêt à l'emploi."
-echo ""
+    # Improve performance
+    echo "vm.swappiness=10" >> /etc/sysctl.conf
+    sysctl -p >/dev/null 2>&1
+}
+
+# --- Function: Clean system ---
+clean_system() {
+    echo -e "${GREEN}[INFO] Cleaning system...${RESET}"
+    apt autoremove -y
+    apt autoclean -y
+}
+
+# --- Run tasks ---
+install_recommended_apps
+
