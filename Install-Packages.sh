@@ -7,7 +7,6 @@
 #  Supports : Ubuntu, Linux Mint, Zorin OS, Debian
 # ============================================
 
-# --- Colors ---
 GREEN="\e[32m"
 RED="\e[31m"
 YELLOW="\e[33m"
@@ -71,3 +70,4 @@ install_packages
 
 echo -e "${GREEN}[DONE] Installation process completed.${RESET}"
 exit 0
+
