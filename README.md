@@ -7,17 +7,20 @@
   <img src="https://img.shields.io/badge/migration-Windows%20%E2%86%92%20Linux-yellow" />
   <img src="https://img.shields.io/badge/license-MIT-lightgrey" />
 </p>
+
 Assistant complet de migration Windows → Linux  
 (sauvegarde, ISO, clé USB bootable, restauration, post-installation)
 Assistant de migration Windows → Linux (sauvegarde, ISO, clé USB, restauration)
+
 # WinToLinux-Migration  
 (sauvegarde, ISO, clé USB bootable, restauration, post-installation)
-## 🎯 Objectif du projet
-- Analyse du système Windows  
-- Sauvegarde automatique des données  
-- Téléchargement d’une ISO Linux  
-- Création d’une clé USB bootable  
-- Génération d’un rapport HTML  
-- Scripts Linux de restauration et post-installation  
 
+## 🎯 Objectif du projet
+* **Analyse du système** : Diagnostic complet de l'environnement Windows actuel.
+* **Sauvegarde automatique** : Archivage sécurisé de vos données personnelles.
+* **Préparation OS** : Téléchargement de l'ISO Linux et création d'une clé USB bootable.
+* **Rapport de migration** : Génération d'un rapport détaillé au format HTML.
+* **Post-installation** : Scripts Linux pour la restauration et la configuration automatique.
+
+## 🚀 Pourquoi utiliser WinToLinux ?
 Ce projet vise à simplifier la transition pour les utilisateurs, tout en offrant un outil professionnel pour les techniciens.
