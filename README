@@ -1,0 +1,146 @@
+# 🐧 WinToLinux Migration
+**Assistant de migration Windows → Linux, simple, automatisé et universel.**
+
+WinToLinux Migration est un outil conçu pour accompagner les utilisateurs Windows dans leur transition vers Linux.  
+Il propose une interface simple, un workflow guidé, et la possibilité d’installer automatiquement **8 distributions Linux populaires**, dont Ubuntu, Zorin OS 18, Fedora, Debian, openSUSE et Bazzite.
+
+---
+
+## 🚀 Fonctionnalités principales
+
+### ✔ Migration simplifiée
+- Détection automatique du matériel
+- Vérification de compatibilité
+- Téléchargement automatisé des ISO officielles
+- Installation guidée et sécurisée
+
+### ✔ Support de 8 distributions Linux
+- **Ubuntu 24.04 LTS**
+- **Kubuntu (KDE)**
+- **Xubuntu (XFCE)**
+- **Zorin OS 18**
+- **Fedora Workstation**
+- **openSUSE Tumbleweed KDE**
+- **Debian 12 XFCE**
+- **Bazzite (Gaming)**
+
+### ✔ Mini‑ISO WintoLinux (en développement)
+Une ISO ultra‑légère basée sur Ubuntu, utilisant **cloud‑init** pour :
+- configurer automatiquement le système (FR, clavier, langue)
+- installer l’assistant WintoLinux
+- lancer l’interface au premier démarrage
+
+### ✔ Automatisation via Cloud‑Init
+WintoLinux supporte le mode **NoCloud-Net**, permettant :
+- installation automatisée
+- configuration post‑installation
+- déploiement PXE ou ISO standard
+
+---
+
+## 📦 Structure du projet
+
+WinToLinux-Migration/
+│
+├── cloud-init/
+│   ├── user-data
+│   ├── meta-data
+│   └── README.md
+│
+├── scripts/
+│   ├── wintolinux.sh
+│   ├── download_iso.sh
+│   └── install_distro.sh
+│
+├── distros/
+│   ├── ubuntu.json
+│   ├── zorin.json
+│   ├── fedora.json
+│   ├── debian.json
+│   ├── opensuse.json
+│   ├── kubuntu.json
+│   ├── xubuntu.json
+│   └── bazzite.json
+│
+├── assets/
+│   ├── logo.png
+│   ├── banner.png
+│   └── screenshots/
+│
+├── docs/
+│   ├── INSTALL.md
+│   ├── MINI-ISO.md
+│   └── WORKFLOW.md
+│
+├── LICENSE
+└── README.md
+
+---
+
+## 🛠️ Installation
+
+### 1. Cloner le projet
+```bash
+git clone https://github.com/webmasterdu63-creator/WinToLinux-Migration
+cd WinToLinux-Migration
+2. Lancer l’assistant
+bash
+
+bash scripts/wintolinux.sh
+
+☁️ Mode Cloud‑Init (NoCloud-Net)
+
+WintoLinux peut être utilisé avec une ISO standard Ubuntu/Fedora/Debian en ajoutant :
+Code
+
+ds=nocloud-net;s=https://sourceforge.net/projects/wintolinux-migration/files/cloud-init/
+
+Cloud‑init appliquera automatiquement :
+
+    langue FR
+
+    clavier FR
+
+    installation de l’assistant
+
+    configuration système
+
+    lancement automatique
+🤝 Contribution
+
+Les contributions sont les bienvenues :
+
+    corrections
+
+    scripts
+
+    nouvelles distros
+
+    améliorations UI
+
+    documentation
+
+Ouvrez une issue ou une pull request.
+📄 Licence
+
+Ce projet est distribué sous licence MIT.
+🌐 Liens
+
+    Page SourceForge : https://sourceforge.net/projects/wintolinux-migration/
+
+    Dépôt GitHub : https://github.com/webmasterdu63-creator/WinToLinux-Migration
+
+Code
+
+
+---
+
+# 🎯 Jean, ce README est **prêt à l’emploi**, professionnel, clair, et parfaitement aligné avec ton projet.
+
+Si tu veux, je peux aussi te préparer :
+
+- le **INSTALL.md**  
+- le **MINI-ISO.md**  
+- le **WORKFLOW.md**  
+- les fichiers JSON des distros  
+- le cloud‑init officiel WintoLinux  
