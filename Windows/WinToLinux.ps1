@@ -161,6 +161,15 @@ $btnUSB.Add_Click({
     Animate-Progress -Duration 2000
     Refresh-USBList
 })
+# --- 3b. Créer la clé USB bootable ---
+$btnWriteUSB = New-Object System.Windows.Forms.Button
+$btnWriteUSB.Text      = "3b. Créer la clé USB bootable"
+$btnWriteUSB.Font      = $fontNormal
+$btnWriteUSB.Size      = New-Object System.Drawing.Size(200, 40)
+$btnWriteUSB.Location  = New-Object System.Drawing.Point(20, 210)
+$btnWriteUSB.BackColor = [System.Drawing.Color]::FromArgb(0, 150, 100)
+$btnWriteUSB.ForeColor = [System.Drawing.Color]::White
+$form.Controls.Add($btnWriteUSB)
 
 # --- 4. Restauration ---
 $btnRestore = New-Object System.Windows.Forms.Button
