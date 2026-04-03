@@ -187,4 +187,5 @@ $btnRestore.Add_Click({
     $result = Restore-UserData
     Write-Log $result
 })
+Format-USBDrive -DeviceID $deviceID -Logger { param($msg) Write-Log $msg }
 
