@@ -96,3 +96,60 @@ $btnISO.Location  = New-Object System.Drawing.Point(20, 110)
 $btnISO.BackColor = $accentColor
 $btnISO.ForeColor = [System.Drawing.Color]::White
 $form.Controls.Add($btn
+
+$btnISO.Add_Click({
+    Write-Log "Sélection d'une ISO Linux..."
+    $iso = Select-LinuxISO
+
+    if ($iso) {
+        Write-Log "ISO sélectionnée : $iso"
+        $hash = Get-ISOHash -ISOPath $iso
+        Write-Log "SHA256 : $hash"
+    } else {
+        Write-Log "Aucune ISO sélectionnée."
+    }
+})
+
+# --- 3. Clé USB ---
+$btnUSB = New-Object System.Windows.Forms.Button
+$btnUSB.Text      = "3. Préparer la clé USB bootable"
+$btnUSB.Font      = $fontNormal
+$btnUSB.Size      = New-Object System.Drawing.Size(200, 40)
+$btnUSB.Location  = New-Object System.Drawing.Point(20, 160)
+$btnUSB.BackColor = $accentColor
+$btnUSB.ForeColor = [System.Drawing.Color]::White
+$form.Controls.Add($btnUSB)
+
+$btnUSB.Add_Click({
+    Write-Log "Détection des clés USB..."
+    $drives = Get-USBDrives
+
+    if ($drives) {
+        foreach ($d in $drives) {
+            Write-Log "USB détectée : $($d.Model) - $($d.DeviceID)"
+        }
+    } else {
+        Write-Log "Aucune clé USB détectée."
+    }
+})
+
+# --- 4. Restauration ---
+$btnRestore = New-Object System.Windows.Forms.Button
+$btnRestore.Text      = "4. Restaurer les données sous Linux"
+$btnRestore.Font      = $fontNormal
+$btnRestore.Size      = New-Object System.Drawing.Size(200, 40)
+$btnRestore.Location  = New-Object System.Drawing.Point(20, 210)
+$btnRestore.BackColor = $accentColor
+$btnRestore.ForeColor = [System.Drawing.Color]::White
+$form.Controls.Add($btnRestore)
+
+$btnRestore.Add_Click({
+    Write-Log "Restauration des données..."
+    $result = Restore-UserData
+    Write-Log $result
+})
+
+# =========================
+#   LANCEMENT DE LA GUI
+# =========================
+[void]$form.ShowDialog()
