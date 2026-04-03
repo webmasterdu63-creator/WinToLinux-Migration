@@ -24,3 +24,4 @@ exit
 
     Remove-Item $scriptPath -Force
 }
+Export-ModuleMember -Function Get-USBDrives, Format-USBDrive
