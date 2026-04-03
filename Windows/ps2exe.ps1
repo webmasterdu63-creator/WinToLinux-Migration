@@ -1,0 +1,7 @@
+ -inputFile WinToLinux.ps1 `
+  -outputFile WinToLinux.exe `
+  -iconFile logo.ico `
+  -title "WinToLinux Migration" `
+  -description "Migration Windows vers Linux - TechNews365" `
+  -product "WinToLinux Migration" `
+  -version "1.0.0"
