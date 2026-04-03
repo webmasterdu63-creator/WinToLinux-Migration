@@ -1,3 +1,10 @@
+# Charger les modules
+$modulePath = Join-Path $PSScriptRoot "modules"
+Import-Module "$modulePath\backup.psm1" -Force
+Import-Module "$modulePath\iso.psm1" -Force
+Import-Module "$modulePath\usb.psm1" -Force
+Import-Module "$modulePath\restore.psm1" -Force
+
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
