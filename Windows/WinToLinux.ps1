@@ -145,7 +145,6 @@ $btnISO.Add_Click({
         Write-Log "Aucune ISO sélectionnée."
     }
 })
-
 # --- 3. Clé USB ---
 $btnUSB = New-Object System.Windows.Forms.Button
 $btnUSB.Text      = "3. Préparer la clé USB bootable"
@@ -156,19 +155,11 @@ $btnUSB.BackColor = $accentColor
 $btnUSB.ForeColor = [System.Drawing.Color]::White
 $form.Controls.Add($btnUSB)
 
+# 👉 Add_Click USB (correct)
 $btnUSB.Add_Click({
-    Write-Log "Détection des clés USB..."
+    Write-Log "Analyse des périphériques USB..."
     Animate-Progress -Duration 2000
-
-    $drives = Get-USBDrives
-
-    if ($drives) {
-        foreach ($d in $drives) {
-            Write-Log "USB détectée : $($d.Model) - $($d.DeviceID)"
-        }
-    } else {
-        Write-Log "Aucune clé USB détectée."
-    }
+    Refresh-USBList
 })
 
 # --- 4. Restauration ---
@@ -188,7 +179,3 @@ $btnRestore.Add_Click({
     Write-Log $result
 })
 
-# =========================
-#   LANCEMENT DE LA GUI
-# =========================
-[void]$form.ShowDialog()
