@@ -68,6 +68,39 @@ function Write-Log {
 }
 
 # =========================
+#   PROGRESS BAR
+# =========================
+$progressBar = New-Object System.Windows.Forms.ProgressBar
+$progressBar.Style = "Continuous"
+$progressBar.Minimum = 0
+$progressBar.Maximum = 100
+$progressBar.Value = 0
+$progressBar.Size = New-Object System.Drawing.Size(550, 25)
+$progressBar.Location = New-Object System.Drawing.Point(240, 470)
+$form.Controls.Add($progressBar)
+
+# =========================
+#   ANIMATION PROGRESS BAR
+# =========================
+function Animate-Progress {
+    param(
+        [int]$Duration = 2000,
+        [int]$Steps = 50
+    )
+
+    $interval = $Duration / $Steps
+
+    for ($i = 0; $i -le $Steps; $i++) {
+        $percent = [math]::Round(($i / $Steps) * 100)
+        $progressBar.Value = $percent
+        Start-Sleep -Milliseconds $interval
+    }
+
+    Start-Sleep -Milliseconds 300
+    $progressBar.Value = 0
+}
+
+# =========================
 #   BOUTONS DU WORKFLOW
 # =========================
 
@@ -83,6 +116,7 @@ $form.Controls.Add($btnBackup)
 
 $btnBackup.Add_Click({
     Write-Log "Démarrage de la sauvegarde..."
+    Animate-Progress -Duration 2500
     $result = Start-BackupWindows
     Write-Log $result
 })
@@ -95,10 +129,12 @@ $btnISO.Size      = New-Object System.Drawing.Size(200, 40)
 $btnISO.Location  = New-Object System.Drawing.Point(20, 110)
 $btnISO.BackColor = $accentColor
 $btnISO.ForeColor = [System.Drawing.Color]::White
-$form.Controls.Add($btn
+$form.Controls.Add($btnISO)
 
 $btnISO.Add_Click({
     Write-Log "Sélection d'une ISO Linux..."
+    Animate-Progress -Duration 1500
+
     $iso = Select-LinuxISO
 
     if ($iso) {
@@ -122,6 +158,8 @@ $form.Controls.Add($btnUSB)
 
 $btnUSB.Add_Click({
     Write-Log "Détection des clés USB..."
+    Animate-Progress -Duration 2000
+
     $drives = Get-USBDrives
 
     if ($drives) {
@@ -145,6 +183,7 @@ $form.Controls.Add($btnRestore)
 
 $btnRestore.Add_Click({
     Write-Log "Restauration des données..."
+    Animate-Progress -Duration 2500
     $result = Restore-UserData
     Write-Log $result
 })
