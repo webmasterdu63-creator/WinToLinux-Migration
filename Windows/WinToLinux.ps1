@@ -120,7 +120,6 @@ $btnBackup.Add_Click({
     $result = Start-BackupWindows
     Write-Log $result
 })
-
 # --- 2. ISO Linux ---
 $btnISO = New-Object System.Windows.Forms.Button
 $btnISO.Text      = "2. Choisir / Télécharger ISO Linux"
@@ -145,6 +144,65 @@ $btnISO.Add_Click({
         Write-Log "Aucune ISO sélectionnée."
     }
 })
+
+# =========================
+#   LISTE DÉROULANTE DISTROS
+# =========================
+$comboDistro = New-Object System.Windows.Forms.ComboBox
+$comboDistro.DropDownStyle = "DropDownList"
+$comboDistro.Font = $fontNormal
+$comboDistro.Size = New-Object System.Drawing.Size(200, 30)
+$comboDistro.Location = New-Object System.Drawing.Point(20, 160)
+
+foreach ($distro in $LinuxDistros.Keys) {
+    $comboDistro.Items.Add($distro)
+}
+
+$form.Controls.Add($comboDistro)
+# --- Bouton Télécharger ISO ---
+$btnDownloadISO = New-Object System.Windows.Forms.Button
+$btnDownloadISO.Text      = "Télécharger l'ISO"
+$btnDownloadISO.Font      = $fontNormal
+$btnDownloadISO.Size      = New-Object System.Drawing.Size(200, 40)
+$btnDownloadISO.Location  = New-Object System.Drawing.Point(20, 200)
+$btnDownloadISO.BackColor = $accentColor
+$btnDownloadISO.ForeColor = [System.Drawing.Color]::White
+$form.Controls.Add($btnDownloadISO)
+
+$btnDownloadISO.Add_Click({
+    if ($comboDistro.SelectedItem -eq $null) {
+        Write-Log "Aucune distribution sélectionnée."
+        return
+    }
+
+    $distro = $comboDistro.SelectedItem
+    $url = $LinuxDistros[$distro]
+
+    Write-Log "Téléchargement de : $distro"
+    Write-Log "URL : $url"
+    Animate-Progress -Duration 1500
+
+    # Chemin de destination
+    $isoPath = "$env:TEMP\$($distro.Replace(' ', '_')).iso"
+
+    try {
+        Write-Log "Téléchargement en cours..."
+        Invoke-WebRequest -Uri $url -OutFile $isoPath -UseBasicParsing
+        Write-Log "Téléchargement terminé : $isoPath"
+
+        # Stocker l’ISO globalement
+        $global:iso = $isoPath
+
+        # Calcul du hash
+        $hash = Get-ISOHash -ISOPath $isoPath
+        Write-Log "SHA256 : $hash"
+    }
+    catch {
+        Write-Log "ERREUR : Impossible de télécharger l'ISO."
+        Write-Log $_.Exception.Message
+    }
+})
+
 # --- 3. Clé USB ---
 $btnUSB = New-Object System.Windows.Forms.Button
 $btnUSB.Text      = "3. Préparer la clé USB bootable"
